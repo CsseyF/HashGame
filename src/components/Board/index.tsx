@@ -19,7 +19,7 @@ const Board = () => {
 
   useEffect(() => {
       const newConnection = new HubConnectionBuilder()
-          .withUrl(' https://localhost:7257/hashgame')
+          .withUrl(' https://hashgame-api-production.up.railway.app/hashgame')
           .withAutomaticReconnect()
           .build();
 
