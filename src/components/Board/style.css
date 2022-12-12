@@ -1,0 +1,6 @@
+.main-board {
+  width: 18em;
+  height: 10em;
+  display: flex;
+  flex-wrap: wrap;
+}

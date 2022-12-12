@@ -1,0 +1,10 @@
+.cell-container {
+  border: solid 1px black;
+  width: 2.5em;
+  height: 3em;
+  padding: 1em;
+}
+
+.cell-image {
+  width: 2.5em;
+}
