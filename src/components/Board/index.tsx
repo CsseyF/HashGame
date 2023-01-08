@@ -3,7 +3,6 @@ import { HubConnectionBuilder } from '@microsoft/signalr';
 import Cell from "./Cell";
 import { ICellProps, IdCells, PlayerSelect } from "./Cell/types";
 import "./style.css";
-import Chat from '../Messages/Chat';
 import { useParams } from 'react-router-dom';
 
 const Board = () => {
@@ -12,6 +11,8 @@ const Board = () => {
   const [ connection, setConnection ] = useState<any>(null);
   const [ chat, setChat ] = useState<{user: string, message: any}[]>([]);
   const latestChat = useRef<any>(null);
+  const [player, setPlayer] = useState<string>("");
+  const [blockGame, setBlockGame] = useState<boolean>(false);
   let { id } = useParams();
   const roomId = id!;
 
@@ -35,7 +36,6 @@ const Board = () => {
                   connection.on('ReceiveMessage', (message : any) => {
                       const updatedChat = [...latestChat.current];
                       updatedChat.push(message);
-                  
                       setChat(updatedChat);
                   });
               })
@@ -85,11 +85,14 @@ const Board = () => {
     if (round % 2 === 0) return PlayerSelect.PlayerOne;
     else return PlayerSelect.PlayerTwo;
   };
+
   const currentPlayer = {
     player: CheckCurrentPlayer(round),
   };
+
   const handlePlay = (cell: ICellProps) => {
     if (cell.player !== null) return;
+    if(blockGame === true) return;
 
     setCellsArray(
       cellsArray.map((item) =>
@@ -99,7 +102,7 @@ const Board = () => {
       )
     );
 
-    sendMessage(Object.keys(PlayerSelect)[currentPlayer.player], cell.cellId)
+    sendMessage(player + `%${Object.keys(PlayerSelect)[currentPlayer.player]}`, cell.cellId)
   };
 
   useEffect(()=> {
@@ -107,17 +110,33 @@ const Board = () => {
       setCellsArray(
         cellsArray.map((item) =>
           item.cellId === message?.message
-            ? { ...item, player: Object.keys(PlayerSelect).indexOf(message?.user)}
+            ? { ...item, player: Object.keys(PlayerSelect).indexOf(message?.user.split("%")[1])}
             : { ...item }
         )
       );
+      
+      if(message.user === "System" && player === ""){
+        setPlayer(message.message);
+        const index = chat.indexOf(message);
+        chat.splice(index, 1);
+      }
+      console.log(message)
     })
-    setRound(round + 1);
+    if(player !== "" && chat[chat.length - 1]?.user !== "System"){
+      setRound(round + 1);
+    }
+    if(chat.slice(-1)[0]?.user.split("%")[0] === player){
+      setBlockGame(true);
+    }
+    else{
+      setBlockGame(false);
+    }
   },[chat])
+
 
   return (
     <div className="main-board">
-      <h2>Your room: {roomId}</h2>
+      <h2 className="board-title">Your room: {roomId}</h2>
       {cellsArray.map((item) => (
         <div onClick={() => handlePlay(item)}>
           <Cell id={item.cellId} selectedBy={item.player} />
