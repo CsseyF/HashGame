@@ -4,6 +4,7 @@ import Cell from "./Cell";
 import { ICellProps, IdCells, PlayerSelect } from "./Cell/types";
 import "./style.css";
 import { useParams } from 'react-router-dom';
+import LoadingOverlay from "../LoadingOverlay";
 
 const Board = () => {
 
@@ -13,6 +14,7 @@ const Board = () => {
   const latestChat = useRef<any>(null);
   const [player, setPlayer] = useState<string>("");
   const [blockGame, setBlockGame] = useState<boolean>(false);
+  const [waitingHandler, setWaitingHandler] = useState<boolean>(true);
   let { id } = useParams();
   const roomId = id!;
 
@@ -21,6 +23,7 @@ const Board = () => {
   useEffect(() => {
       const newConnection = new HubConnectionBuilder()
           .withUrl(' https://hashgame-api-production.up.railway.app/hashgame')
+          // .withUrl(' http://localhost:5257/hashgame')
           .withAutomaticReconnect()
           .build();
 
@@ -115,10 +118,16 @@ const Board = () => {
         )
       );
       
-      if(message.user === "System" && player === ""){
+      if(message.user === "System" &&  player === "" ){
         setPlayer(message.message);
         const index = chat.indexOf(message);
         chat.splice(index, 1);
+      }
+      if(message.user === "System" || message.user === "Host"){
+        if( player !== "" && waitingHandler === true){
+          setWaitingHandler(false);
+          sendMessage("Host", "Match Begin");
+        }
       }
       console.log(message)
     })
@@ -136,6 +145,10 @@ const Board = () => {
 
   return (
     <div className="main-board">
+      <LoadingOverlay
+        show={waitingHandler}
+        relative
+      />
       <h2 className="board-title">Your room: {roomId}</h2>
       {cellsArray.map((item) => (
         <div onClick={() => handlePlay(item)}>
