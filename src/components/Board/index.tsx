@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import Cell from "./Cell";
-import { ICellProps, IdCells, PlayerSelect } from "./Cell/types";
+import { ICellProps, IdCells, InitialBoardState, PlayerSelect } from "./Cell/types";
 import "./style.css";
 import { useParams } from 'react-router-dom';
 import LoadingOverlay from "../LoadingOverlay";
@@ -18,12 +18,27 @@ const Board = () => {
   let { id } = useParams();
   const roomId = id!;
 
+  const winsCombinations = [
+    ['0', '1', '2'],
+    ['3', '4', '5'],
+    ['6', '7', '8'],
+    ['0', '3', '6'],
+    ['1', '4', '7'],
+    ['2', '5', '8'],
+    ['0', '4', '8'],
+    ['2', '4', '6']
+  ]
+  const players = {
+    [PlayerSelect.PlayerOne] : 0,
+    [PlayerSelect.PlayerTwo] : 1,
+  }
+
   latestChat.current = chat;
 
   useEffect(() => {
       const newConnection = new HubConnectionBuilder()
           .withUrl(' https://hashgame-api-production.up.railway.app/hashgame')
-          // .withUrl(' http://localhost:5257/hashgame')
+          //.withUrl(' http://localhost:5257/hashgame')
           .withAutomaticReconnect()
           .build();
 
@@ -70,19 +85,10 @@ const Board = () => {
           }
       }
 
-  const StringIsNumber = (value: any) => isNaN(Number(value)) === false;
+
 
   const [round, setRound] = useState<number>(0);
-  const [cellsArray, setCellsArray] = useState<ICellProps[]>(
-    Object.keys(IdCells)
-      .filter(StringIsNumber)
-      .map((obj) => {
-        return {
-          cellId: obj,
-          player: null,
-        };
-      })
-  );
+  const [cellsArray, setCellsArray] = useState<ICellProps[]>(InitialBoardState);
 
   const CheckCurrentPlayer = (round: number) => {
     if (round % 2 === 0) return PlayerSelect.PlayerOne;
@@ -92,6 +98,24 @@ const Board = () => {
   const currentPlayer = {
     player: CheckCurrentPlayer(round),
   };
+  // const allEqual = (arr : ICellProps[])  => arr.every(val => val.player === arr[0].player);
+
+  const checkWin = () => {
+    const currentCells = cellsArray.filter(cell => cell.player !== null);
+    const sortedCells = currentCells.sort((a, b) => players[a.player!] - players[b.player!])
+    const cellsGroups = new Array(Math.ceil(sortedCells.length / 3))
+      .fill('')
+      .map(_ => sortedCells.splice(0, 3));
+    
+      winsCombinations.map(combination => {
+        const tempArr = cellsGroups.map(item => item.sort().map(item2 => item2.cellId)).sort()
+        if(tempArr.some(a => combination.every((v, i) => v === a[i]))){
+          setBlockGame(true);
+          sendMessage("EndGame", "Game ended!")
+          setCellsArray(InitialBoardState)
+        }
+      })
+  }
 
   const handlePlay = (cell: ICellProps) => {
     if (cell.player !== null) return;
@@ -129,6 +153,9 @@ const Board = () => {
           sendMessage("Host", "Match Begin");
         }
       }
+      if(message.user === "EndGame"){
+        setBlockGame(true);
+      }
       console.log(message)
     })
     if(player !== "" && chat[chat.length - 1]?.user !== "System"){
@@ -140,6 +167,7 @@ const Board = () => {
     else{
       setBlockGame(false);
     }
+    checkWin();
   },[chat])
 
 

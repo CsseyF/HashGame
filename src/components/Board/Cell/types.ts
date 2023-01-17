@@ -19,3 +19,13 @@ export enum PlayerSelect {
   PlayerOne,
   PlayerTwo,
 }
+
+const StringIsNumber = (value: any) => isNaN(Number(value)) === false;
+export const InitialBoardState = Object.keys(IdCells)
+.filter(StringIsNumber)
+.map((obj) => {
+  return {
+    cellId: obj,
+    player: null,
+  };
+})
