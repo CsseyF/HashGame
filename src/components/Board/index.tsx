@@ -37,8 +37,8 @@ const Board = () => {
 
   useEffect(() => {
       const newConnection = new HubConnectionBuilder()
-          // .withUrl(' https://hashgame-api-production.up.railway.app/hashgame')
-          .withUrl(' http://localhost:5257/hashgame')
+          .withUrl(' https://hashgame-api-production.up.railway.app/hashgame')
+          // .withUrl(' http://localhost:5257/hashgame')
           .withAutomaticReconnect()
           .build();
 
