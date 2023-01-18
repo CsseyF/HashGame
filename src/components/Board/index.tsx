@@ -37,8 +37,8 @@ const Board = () => {
 
   useEffect(() => {
       const newConnection = new HubConnectionBuilder()
-          .withUrl(' https://hashgame-api-production.up.railway.app/hashgame')
-          //.withUrl(' http://localhost:5257/hashgame')
+          // .withUrl(' https://hashgame-api-production.up.railway.app/hashgame')
+          .withUrl(' http://localhost:5257/hashgame')
           .withAutomaticReconnect()
           .build();
 
@@ -110,9 +110,7 @@ const Board = () => {
       winsCombinations.map(combination => {
         const tempArr = cellsGroups.map(item => item.sort().map(item2 => item2.cellId)).sort()
         if(tempArr.some(a => combination.every((v, i) => v === a[i]))){
-          setBlockGame(true);
           sendMessage("EndGame", "Game ended!")
-          setCellsArray(InitialBoardState)
         }
       })
   }
@@ -155,6 +153,8 @@ const Board = () => {
       }
       if(message.user === "EndGame"){
         setBlockGame(true);
+        setCellsArray(InitialBoardState)
+        setRound(0);
       }
       console.log(message)
     })

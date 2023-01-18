@@ -1,0 +1,69 @@
+@font-face {
+  font-family: 'BalltimoreSans';
+  src: url('../../../../assets/fonts/balltimore-sans-font/BalltimoreSans-RpDLW.otf');
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;500;600&display=swap');
+
+.home-modal-container {
+  min-width: 50vw;
+  min-height: 70vh;
+
+  margin-bottom: 5%;
+  border-radius: 2vw;
+}
+
+.game-title{
+  margin-top: 10vh;
+  font-size: 2vw;
+  font-family: 'BalltimoreSans';
+  text-shadow: 1px 1px 2px rgb(22, 22, 22)
+
+}
+
+.home-modal-buttons-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+
+  margin-top: 3vw;
+}
+
+.home-modal-about-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+
+}
+
+.home-modal-about-text{
+  font-family: 'Red Hat Display', sans-serif;
+  font-weight: 500;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.411);
+
+  width: 25vw;
+}
+
+.home-modal-button{
+  font-family: 'Red Hat Display', sans-serif;
+  font-weight: 400;
+  font-size: 1vw;
+
+  margin: 1vw 0;
+
+  border: none;
+  padding: 1vw 2vw;
+  border-radius: 2vw;
+
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+.home-modal-button:hover{
+  transform: scale(1.1);
+  transition: 0.5s;
+}
